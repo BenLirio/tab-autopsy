@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Autopsy — a forensic report on your browser tabs</title>
+  <meta property="og:title" content="Tab Autopsy">
+  <meta property="og:description" content="Paste 6 of your open browser tabs. Receive a dead-pan coroner's report on your attention. Screenshotable. Sharable. Damning.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&family=Libre+Barcode+128+Text&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+  <script src="feedback.js" defer></script>
+</head>
+<body>
+  <main id="app">
+    <!-- INTAKE SCREEN -->
+    <section id="intake" class="screen">
+      <header class="intake-header">
+        <div class="stamp-line">
+          <span class="stamp stamp-red">CONFIDENTIAL</span>
+          <span class="case-no">CASE NO. <span id="intake-case">—</span></span>
+        </div>
+        <h1 class="masthead">TAB&nbsp;AUTOPSY</h1>
+        <p class="sub">County Coroner's Office&nbsp;&middot;&nbsp;Dept. of Digital Pathology</p>
+        <p class="brief">Enter the six (6) browser tabs currently open on the deceased device. The pathologist will examine each specimen.</p>
+      </header>
+
+      <form id="intake-form" autocomplete="off" novalidate>
+        <ol class="tab-list">
+          <li class="tab-row">
+            <label for="tab-1">Tab&nbsp;1</label>
+            <input id="tab-1" name="tab-1" type="text" maxlength="160" placeholder="e.g. Stardew Valley Wiki - Crops" spellcheck="false">
+          </li>
+          <li class="tab-row">
+            <label for="tab-2">Tab&nbsp;2</label>
+            <input id="tab-2" name="tab-2" type="text" maxlength="160" placeholder="e.g. gmail.com (27 unread)" spellcheck="false">
+          </li>
+          <li class="tab-row">
+            <label for="tab-3">Tab&nbsp;3</label>
+            <input id="tab-3" name="tab-3" type="text" maxlength="160" placeholder="e.g. How to make miso at home - Serious Eats" spellcheck="false">
+          </li>
+          <li class="tab-row">
+            <label for="tab-4">Tab&nbsp;4</label>
+            <input id="tab-4" name="tab-4" type="text" maxlength="160" placeholder="e.g. (2) reddit.com/r/AmItheAsshole" spellcheck="false">
+          </li>
+          <li class="tab-row">
+            <label for="tab-5">Tab&nbsp;5</label>
+            <input id="tab-5" name="tab-5" type="text" maxlength="160" placeholder="e.g. Zillow - 3bd house in Asheville" spellcheck="false">
+          </li>
+          <li class="tab-row">
+            <label for="tab-6">Tab&nbsp;6</label>
+            <input id="tab-6" name="tab-6" type="text" maxlength="160" placeholder="e.g. YouTube: &quot;how the Roman aqueducts worked&quot;" spellcheck="false">
+          </li>
+        </ol>
+
+        <p id="intake-error" class="error hidden" aria-live="polite"></p>
+
+        <button id="begin-btn" type="submit" class="primary">Begin Autopsy</button>
+        <p class="disclaimer">No data saved server-side. The pathologist is judgmental but discreet.</p>
+      </form>
+    </section>
+
+    <!-- LOADING SCREEN -->
+    <section id="loading" class="screen hidden" aria-live="polite">
+      <div class="loader-box">
+        <div class="stamp stamp-red small">IN PROGRESS</div>
+        <p class="loader-copy" id="loader-copy">consulting the archives<span class="dot-anim"></span></p>
+        <p class="loader-sub">Time of death being determined, per tab.</p>
+      </div>
+    </section>
+
+    <!-- RESULT SCREEN -->
+    <section id="result" class="screen hidden">
+      <article id="report" class="report">
+        <div class="clipboard-clip" aria-hidden="true"></div>
+
+        <header class="report-head">
+          <div class="stamp-line">
+            <span class="stamp stamp-red">CASE&nbsp;FILE</span>
+            <span class="case-no">NO. <span id="case-no">—</span></span>
+          </div>
+          <p class="office">OFFICE OF THE CHIEF CORONER&nbsp;&middot;&nbsp;DIGITAL PATHOLOGY DIV.</p>
+          <h2 class="report-title">POST-MORTEM REPORT</h2>
+          <dl class="report-meta">
+            <dt>DECEDENT</dt><dd>Six (6) browser tabs, open</dd>
+            <dt>SUBMITTED BY</dt><dd>the user, voluntarily</dd>
+            <dt>EXAMINER</dt><dd>Dr. A. Tabsworth, DCP</dd>
+            <dt>DATE OF EXAMINATION</dt><dd id="report-date">—</dd>
+          </dl>
+        </header>
+
+        <section class="archetype-block">
+          <p class="label">DIAGNOSED ARCHETYPE</p>
+          <h1 id="archetype-name" class="archetype-name">—</h1>
+          <p id="dominant-mode" class="dominant-mode">—</p>
+        </section>
+
+        <section class="toe-tags">
+          <p class="label">TIMES OF DEATH, PER SPECIMEN</p>
+          <ol id="tag-list" class="tag-list"></ol>
+        </section>
+
+        <section class="prescription">
+          <p class="label">PRESCRIPTION</p>
+          <p id="prescription" class="prescription-text">—</p>
+        </section>
+
+        <footer class="report-foot">
+          <div class="signature-row">
+            <div class="sig">
+              <div class="sig-line"></div>
+              <p class="sig-name">Dr. A. Tabsworth</p>
+            </div>
+            <div class="stamp stamp-red tilt">FILED</div>
+          </div>
+          <p class="barcode">||||| || ||| |||| | || ||||| | ||</p>
+          <p class="finepr" id="barcode-num">—</p>
+        </footer>
+
+        <div class="perf-edge perf-bottom" aria-hidden="true"></div>
+      </article>
+
+      <div id="share" class="share-row">
+        <button onclick="share()" class="primary">Share Autopsy</button>
+        <button id="reset-btn" type="button" class="secondary">New Case</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

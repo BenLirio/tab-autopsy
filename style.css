@@ -135,6 +135,102 @@ main {
   line-height: 1.45;
 }
 
+/* -------- mode toggle (paste vs fields) -------- */
+
+.mode-toggle {
+  display: flex;
+  gap: 0;
+  margin: 0 0 14px;
+  border: 1.5px solid var(--rule);
+  background: rgba(255,255,255,0.25);
+}
+
+.mode-btn {
+  flex: 1 1 0;
+  min-height: 44px;
+  padding: 10px 8px;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 0;
+  border-right: 1.5px dashed var(--rule);
+  font-family: 'Special Elite', monospace;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+.mode-btn:last-child { border-right: 0; }
+.mode-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.entry-mode.hidden { display: none; }
+
+/* -------- paste mode -------- */
+
+.paste-label {
+  display: block;
+  margin: 0 0 6px;
+  font-family: 'Special Elite', monospace;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+#tabs-paste {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--ink);
+  background: rgba(255,253,240,0.55);
+  border: 1.5px solid var(--rule);
+  border-radius: 0;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+#tabs-paste:focus {
+  background: rgba(255,255,230,0.65);
+  border-color: var(--blood);
+}
+#tabs-paste::placeholder {
+  color: rgba(59,50,42,0.5);
+}
+
+.paste-count {
+  margin: 6px 2px 0;
+  font-family: 'Special Elite', monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.paste-count.paste-count-ready { color: var(--ink); }
+.paste-count.paste-count-over { color: var(--blood); }
+
+.ghost-link {
+  display: inline-block;
+  margin: 8px 0 0;
+  padding: 6px 0;
+  min-height: 32px;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 0;
+  font-family: 'Special Elite', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ghost-link:hover { color: var(--blood); }
+
 .tab-list {
   list-style: none;
   margin: 0;
@@ -576,10 +672,23 @@ button.secondary:hover { background: rgba(0,0,0,0.05); }
 
 /* narrow-screen polish: 375px */
 @media (max-width: 400px) {
+  body { padding: 12px 10px 80px; }
   .masthead { font-size: 38px; }
   .archetype-name { font-size: 40px; }
   .report-title { font-size: 22px; letter-spacing: 0.18em; }
   .barcode { font-size: 30px; }
-  .tab-row label { flex-basis: 48px; font-size: 12px; }
-  .tab-row input { font-size: 18px; }
+  .tab-row { padding: 8px 8px; }
+  .tab-row label { flex-basis: 48px; font-size: 12px; height: 40px; }
+  .tab-row input {
+    font-size: 18px;
+    min-height: 48px;
+    padding: 10px 6px;
+  }
+  #tabs-paste {
+    font-size: 18px;
+    min-height: 220px;
+    padding: 12px 10px;
+  }
+  .mode-btn { font-size: 12px; letter-spacing: 0.1em; }
+  button.primary { font-size: 16px; letter-spacing: 0.14em; min-height: 56px; }
 }

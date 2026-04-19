@@ -351,7 +351,17 @@ function stripFragment() {
 
 const $ = (id) => document.getElementById(id);
 
-function readTabs() {
+// Current entry mode: "paste" (default, one textarea) or "fields" (six inputs).
+let entryMode = "paste";
+
+function parsePasteLines(raw) {
+  return String(raw || "")
+    .split(/\r?\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function readTabsFromFields() {
   const tabs = [];
   for (let i = 1; i <= NUM_TABS; i++) {
     const el = $("tab-" + i);
@@ -360,17 +370,68 @@ function readTabs() {
   return tabs;
 }
 
+function readTabsFromPaste() {
+  const el = $("tabs-paste");
+  const lines = parsePasteLines(el ? el.value : "");
+  const tabs = [];
+  for (let i = 0; i < NUM_TABS; i++) tabs.push(lines[i] || "");
+  return tabs;
+}
+
+function readTabs() {
+  return entryMode === "paste" ? readTabsFromPaste() : readTabsFromFields();
+}
+
 function setTabs(tabs) {
   for (let i = 1; i <= NUM_TABS; i++) {
     const el = $("tab-" + i);
     if (el) el.value = tabs[i - 1] || "";
   }
+  const pasteEl = $("tabs-paste");
+  if (pasteEl) {
+    pasteEl.value = tabs.filter(Boolean).join("\n");
+    updatePasteCount();
+  }
+}
+
+function updatePasteCount() {
+  const el = $("tabs-paste");
+  const countEl = $("paste-count");
+  if (!el || !countEl) return;
+  const n = parsePasteLines(el.value).length;
+  countEl.textContent = `${Math.min(n, NUM_TABS)} / ${NUM_TABS} lines`;
+  countEl.classList.toggle("paste-count-ready", n >= NUM_TABS);
+  countEl.classList.toggle("paste-count-over", n > NUM_TABS);
+}
+
+function setEntryMode(mode) {
+  entryMode = mode === "fields" ? "fields" : "paste";
+  const paste = $("paste-mode");
+  const fields = $("fields-mode");
+  const pasteBtn = $("mode-paste-btn");
+  const fieldsBtn = $("mode-fields-btn");
+  if (paste) paste.classList.toggle("hidden", entryMode !== "paste");
+  if (fields) fields.classList.toggle("hidden", entryMode !== "fields");
+  if (pasteBtn) {
+    pasteBtn.classList.toggle("active", entryMode === "paste");
+    pasteBtn.setAttribute("aria-selected", entryMode === "paste" ? "true" : "false");
+  }
+  if (fieldsBtn) {
+    fieldsBtn.classList.toggle("active", entryMode === "fields");
+    fieldsBtn.setAttribute("aria-selected", entryMode === "fields" ? "true" : "false");
+  }
+  const errEl = $("intake-error");
+  if (errEl) errEl.classList.add("hidden");
 }
 
 function validateTabs(tabs) {
   const filled = tabs.filter(Boolean).length;
   if (filled < NUM_TABS) {
-    return `the pathologist requires all six specimens. ${NUM_TABS - filled} still missing.`;
+    const missing = NUM_TABS - filled;
+    if (entryMode === "paste") {
+      return `the pathologist requires all six specimens, one per line. ${missing} still missing.`;
+    }
+    return `the pathologist requires all six specimens. ${missing} still missing.`;
   }
   return null;
 }
@@ -466,11 +527,33 @@ function onSubmit(e) {
 
 function onReset() {
   stripFragment();
-  // Clear inputs and return to intake.
+  // Clear inputs in both modes and return to intake.
   setTabs(["", "", "", "", "", ""]);
+  const pasteEl = $("tabs-paste");
+  if (pasteEl) pasteEl.value = "";
+  updatePasteCount();
   $("intake-error").classList.add("hidden");
   renderIntakeCasePreview();
   showScreen("intake");
+}
+
+// Sample tabs for the "Use a sample" affordance — helps mobile users see what
+// the output looks like without typing six strings into a tiny screen.
+const SAMPLE_TABS = [
+  "Stardew Valley Wiki - Crops",
+  "gmail.com (27 unread)",
+  "How to make miso at home - Serious Eats",
+  "(2) reddit.com/r/AmItheAsshole",
+  "Zillow - 3bd house in Asheville",
+  "YouTube: how the Roman aqueducts worked",
+];
+
+function onUseSample() {
+  setTabs(SAMPLE_TABS);
+  const pasteEl = $("tabs-paste");
+  if (pasteEl && entryMode === "paste") pasteEl.focus();
+  const errEl = $("intake-error");
+  if (errEl) errEl.classList.add("hidden");
 }
 
 // Share: prefer navigator.share with URL containing the #fragment; fallback to clipboard.
@@ -496,11 +579,24 @@ window.share = share;
 
 document.addEventListener("DOMContentLoaded", () => {
   renderIntakeCasePreview();
+  setEntryMode("paste");
+  updatePasteCount();
 
   const form = $("intake-form");
   if (form) form.addEventListener("submit", onSubmit);
   const resetBtn = $("reset-btn");
   if (resetBtn) resetBtn.addEventListener("click", onReset);
+
+  const pasteBtn = $("mode-paste-btn");
+  if (pasteBtn) pasteBtn.addEventListener("click", () => setEntryMode("paste"));
+  const fieldsBtn = $("mode-fields-btn");
+  if (fieldsBtn) fieldsBtn.addEventListener("click", () => setEntryMode("fields"));
+
+  const pasteEl = $("tabs-paste");
+  if (pasteEl) pasteEl.addEventListener("input", updatePasteCount);
+
+  const sampleBtn = $("sample-btn");
+  if (sampleBtn) sampleBtn.addEventListener("click", onUseSample);
 
   // Deep-link replay: if URL has a valid #r=... fragment, pre-fill and run.
   const fromFragment = decodeFragment();

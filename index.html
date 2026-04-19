@@ -30,7 +30,22 @@
       </header>
 
       <form id="intake-form" autocomplete="off" novalidate>
-        <ol class="tab-list">
+        <div class="mode-toggle" role="tablist" aria-label="Entry mode">
+          <button type="button" id="mode-paste-btn" class="mode-btn active" role="tab" aria-selected="true">Paste 6 Titles</button>
+          <button type="button" id="mode-fields-btn" class="mode-btn" role="tab" aria-selected="false">One-by-One</button>
+        </div>
+
+        <!-- PASTE MODE (default, fastest on mobile) -->
+        <div id="paste-mode" class="entry-mode">
+          <label for="tabs-paste" class="paste-label">Paste or type six tab titles, one per line.</label>
+          <textarea id="tabs-paste" rows="8" maxlength="1100" spellcheck="false"
+            placeholder="Stardew Valley Wiki - Crops&#10;gmail.com (27 unread)&#10;How to make miso at home - Serious Eats&#10;(2) reddit.com/r/AmItheAsshole&#10;Zillow - 3bd house in Asheville&#10;YouTube: how the Roman aqueducts worked"></textarea>
+          <p id="paste-count" class="paste-count" aria-live="polite">0 / 6 lines</p>
+          <button type="button" id="sample-btn" class="ghost-link">Use a sample</button>
+        </div>
+
+        <!-- FIELDS MODE (legacy, one input per tab) -->
+        <ol id="fields-mode" class="tab-list entry-mode hidden">
           <li class="tab-row">
             <label for="tab-1">Tab&nbsp;1</label>
             <input id="tab-1" name="tab-1" type="text" maxlength="160" placeholder="e.g. Stardew Valley Wiki - Crops" spellcheck="false">
